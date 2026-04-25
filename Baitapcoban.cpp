@@ -1,69 +1,73 @@
 #include <iostream>
 #include <string>
-#include <iomanip> 
-
 using namespace std;
 
-struct Date {
-    int day, month, year;
+struct Ngay
+  {
+	int ngay, thang, nam;
+  };
+
+struct SinhVien
+  {
+	char maSV[8];
+	char hoTen[50];
+	int gioiTinh;
+	Ngay ngaySinh;
+	char diaChi[100];
+	char lop[12];
+	char khoa[7];
+   };
+
+struct Node
+{
+	SinhVien data;
+	Node *link;
+};
+struct List
+{
+ 	Node *first;
+	Node *last;
 };
 
-struct SinhVien {
-    string maSV;
-    string hoTen;
-    string gioiTinh;
-    string diaChi; 
-    string lop;
-    string khoa;
-    Date ngaySinh;
-};
-
-struct Node {
-    SinhVien data;
-    Node* next;
-};
 
 int main() {
-    Node* head = NULL;
-    Node* tail = NULL;
+   
+    List L;
+    L.first = L.last = NULL;
 
     SinhVien ds[4] = {
-        {"202414085", "Dang Van Duy", "Nam", "HN", "DT01", "Dien tu", {15, 5, 2005}},
-        {"202414001", "Dang Van Duy", "Nam", "HP", "DT02", "Dien tu", {20, 10, 2005}},
-        {"202414099", "Dang Van Duy", "Nu", "ND", "DT01", "Dien tu", {15, 5, 2005}},
-        {"202413500", "Dang Van Duy", "Nam", "TH", "DT03", "CNTT", {1, 1, 2005}}
+        {"SV001", "Dang Van Duy", 1, {15, 5, 2005}, "HN", "DT01", "DT"},
+        {"SV002", "Dang Van Duy", 1, {20, 10, 2005}, "HP", "DT02", "DT"},
+        {"SV003", "Dang Van Duy", 0, {15, 5, 2005}, "ND", "DT01", "DT"},
+        {"SV004", "Dang Van Duy", 1, {1, 1, 2005}, "TH", "DT03", "CNTT"}
     };
 
     for (int i = 0; i < 4; i++) {
         Node* newNode = new Node;
         newNode->data = ds[i];
-        newNode->next = NULL;
+        newNode->link = NULL;
 
-        if (head == NULL) {
-            head = tail = newNode;
+        if (L.first == NULL) {
+            L.first = L.last = newNode;
         } else {
-            tail->next = newNode;
-            tail = newNode;
+            L.last->link = newNode;
+            L.last = newNode;
         }
     }
 
-    // --- XUẤT (In danh sách ra) ---
-    cout << left << setw(12) << "MSSV" << setw(20) << "Ho Ten" << setw(10) << "Lop" << "Ngay Sinh" << endl;
+    cout  << "MSSV" << "Ho Ten"  << "Lop" << "Ngay Sinh" << endl;
     cout << "------------------------------------------------------------" << endl;
     
-    Node* p = head;
+    Node* p = L.first;
     while (p != NULL) {
-        cout << left << setw(12) << p->data.maSV 
-             << setw(20) << p->data.hoTen 
-             << setw(10) << p->data.lop 
-             << p->data.ngaySinh.day << "/" << p->data.ngaySinh.month << "/" << p->data.ngaySinh.year << endl;
-        p = p->next;
+        cout  << p->data.maSV << p->data.hoTen  << p->data.lop  << p->data.ngaySinh.ngay << "/" << p->data.ngaySinh.thang << "/" << p->data.ngaySinh.nam << endl;
+        p = p->link;
     }
 
-    // Giải phóng bộ nhớ (nên làm để tránh rò rỉ bộ nhớ)
-    while (head != NULL) {
-        Node* temp = head;
-        head = head->next;
+    // 4. Giải phóng bộ nhớ
+    while (L.first != NULL) {
+        Node* temp = L.first;
+        L.first = L.first->link;
         delete temp;
     }
 
