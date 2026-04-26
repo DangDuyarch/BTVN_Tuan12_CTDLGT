@@ -6,8 +6,9 @@ struct Node {
     Node(int val) : id(val), next(nullptr) {}
 };
 
-int findFirstRemoved(int n, int m) {
+int findWinner(int n, int m) {
     if (n <= 0) return -1;
+    if (n == 1) return 1;
 
     Node* head = new Node(1);
     Node* curr = head;
@@ -16,23 +17,41 @@ int findFirstRemoved(int n, int m) {
         curr = curr->next;
     }
     curr->next = head; 
-    Node* target = head;
-    for (int i = 0; i < m; i++) {
-        target = target->next;
+
+    Node* prev = curr; 
+    curr = head;      
+
+    while (curr->next != curr) { 
+        // Truyền bóng qua M lần
+        for (int i = 0; i < m; i++) {
+            prev = curr;
+            curr = curr->next;
+        }
+
+       
+        prev->next = curr->next;
+        std::cout << "Loai nguoi so: " << curr->id << std::endl;
+        
+        Node* temp = curr;
+        curr = prev->next; 
+        delete temp;       // Giải phóng bộ nhớ
     }
 
-    int firstRemovedId = target->id;
-
-
-    return firstRemovedId;
+    int winnerId = curr->id;
+    delete curr; // Giải phóng người chiến thắng cuối cùng
+    return winnerId;
 }
 
 int main() {
     int n, m;
-    std::cout << "Nhap N (so nguoi) va M (buoc truyen): ";
-    std::cin >> n >> m;
+    std::cout << "Nhap so nguoi va buoc truyen: ";
+    if (!(std::cin >> n >> m)) return 0;
 
-    std::cout << "Nguoi dau tien bi loai la: " << findFirstRemoved(n, m) << std::endl;
+    int winner = findWinner(n, m);
+    if (winner != -1) {
+        
+        std::cout << "Nguoi con lai la: " << winner << std::endl;
+    }
 
     return 0;
 }

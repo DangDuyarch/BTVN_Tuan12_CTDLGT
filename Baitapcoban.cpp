@@ -56,6 +56,52 @@ void ThemSV(Node*& head, SinhVien newSVData) {     // 1. Tạo Node mới và g�
     p->link = Newnode;
 }
 
+void XoaNode(Node*& head, Node* toDelete) {
+    if (head == nullptr || toDelete == nullptr) return;
+
+    if (head == toDelete) {
+        head = head->link;
+        delete toDelete;
+        return;
+    }
+
+    Node* p = head;
+    while (p->link != nullptr && p->link != toDelete) {
+        p = p->link;
+    }
+
+    if (p->link == toDelete) {
+        p->link = toDelete->link;
+        delete toDelete;
+    }
+}
+
+void LoaiBoSVTrungNgaySinh(Node*& head) {
+    Node* curr = head;
+    while (curr != nullptr) {
+        bool biTrung = false;
+        
+        // Dò xem curr có trùng ngày sinh với bất kỳ Node q nào khác không
+        for (Node* q = head; q != nullptr; q = q->link) {
+            if (curr != q && 
+                curr->data.ngaySinh.ngay == q->data.ngaySinh.ngay &&
+                curr->data.ngaySinh.thang == q->data.ngaySinh.thang &&
+                curr->data.ngaySinh.nam == q->data.ngaySinh.nam) {
+                biTrung = true;
+                break;
+            }
+        }
+
+        if (biTrung) {
+            Node* temp = curr;
+            curr = curr->link; // Nhảy sang node tiếp theo TRƯỚC KHI xóa node hiện tại
+            XoaNode(head, temp);
+        } else {
+            curr = curr->link;
+        }
+    }
+}
+
 void InSVCungNgaySinh(Node* head) {
     bool foundGlobal = false;
     Node* p = head;
@@ -120,9 +166,7 @@ void InDanhSach(Node* head) {
 
 int main() {
     Node* head = nullptr; 
-    // Thêm vào (hàm ThemSV sẽ tự sắp xếp theo MSSV)
-// Danh sach 8 sinh vien voi MSSV 8 so (dang 2024xxxx)
-// Danh sach 8 sinh vien voi MSSV 9 so
+ 
     ThemSV(head, {"202414405", "Tran Hoang Hai", 1, {10, 1, 2006}, "HN", "DT05", "SEEE"});
     ThemSV(head, {"202414406", "Nguyen Duc Duy", 1, {15, 2, 2006}, "HN", "DT05", "SEEE"});
     ThemSV(head, {"202414401", "Nguyen Duc Kien", 1, {20, 3, 2006}, "HN", "DT05", "SEEE"});
@@ -135,12 +179,19 @@ int main() {
     ThemSV(head, {"202414365", "Nguyen Quoc Huy", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
     ThemSV(head, {"202414103", "Hoang Lam Que", 0, {18, 8, 2006}, "HN", "DT05", "SEEE"});
 
-cout << "\nDang thuc hien xoa sinh vien trung ngay sinh..." << endl;
+cout << "\nCac  sinh vien trung ngay sinh" << endl;
     InSVCungNgaySinh(head);
 
-    // In ra kết quả
-    cout << "Danh sach sinh vien sau khi sap xep:" << endl;
+
+    cout << "Loai bo sinh vien trung ngay sinh" << endl;
+    LoaiBoSVTrungNgaySinh(head);
+    cout << "Da xoa xong!" << endl << endl;
+
+
+    cout << "Danh sach sau khi xoa sinh vien trung ngay sinh" << endl;
     InDanhSach(head);
+
+
 
     return 0;
 }
