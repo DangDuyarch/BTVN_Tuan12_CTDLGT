@@ -30,121 +30,118 @@ struct List     // Khai bao danh sach
 	Node *last;
 };
 
-void ThemSV(List &L, SinhVien newSVData) {
-    Node* Newnode = new Node;       // Khai bao mot node moi
-    Newnode->data = newSVData;
+void ThemSV(List &List, SinhVien newSVData) {
+    Node* Newnode = new Node;       // Tao node
+    Newnode->data = newSVData;   // Gan data cho node moi
     Newnode->link = nullptr;
 
-    if (L.first == nullptr || strcmp(newSVData.maSV, L.first->data.maSV) < 0) {
-        Newnode->link = L.first;
-        L.first = Newnode;              // Chen vao dau tien neu ds dang rong
-        return;
-    }
+    if (List.first == nullptr || strcmp(newSVData.maSV, List.first->data.maSV) < 0) {  // Kiem tra ds co trong hoac co the chen node moi vào dau
+    Newnode->link = List.first;
+    List.first = Newnode;              // Chen vao dau tien neu ds dang rong...
+    return; }
 
-    Node* p = L.first;
-    while (p->link != nullptr && strcmp(p->link->data.maSV, newSVData.maSV) < 0) {
-        p = p->link;                           // Tim vi tri chen
-    }
-
+    Node* p = List.first;
+    while (p->link != nullptr && strcmp(p->link->data.maSV, newSVData.maSV) < 0) {  p = p->link;   }                        // Tim vi tri chen
     Newnode->link = p->link;                // Chen node
     p->link = Newnode;
 }
 
-void XoaSV(Node*& head, Node* toDelete) {
-    if (head == nullptr || toDelete == nullptr) return;
+void XoaSV(Node*& first, Node* SVDelete) {
+    if (first == nullptr || SVDelete == nullptr) return; // ktra xem ds co trong kh
 
-    if (head == toDelete) {
-        head = head->link;
-        delete toDelete;
-        return;
-    }
+    if (first == SVDelete) {   // Xoa neu sv o dau danh sach
+        first = first->link;
+        delete SVDelete;
+        return; }
 
-    Node* p = head;
-    while (p->link != nullptr && p->link != toDelete) {
-        p = p->link;
-    }
+    Node* p = first;
+    while (p->link != nullptr && p->link != SVDelete) {  p = p->link;     }   // Tim vi tri nguoi dung truoc sv can xoa 
 
-    if (p->link == toDelete) {
-        p->link = toDelete->link;
-        delete toDelete;
-    }
+    if (p->link == SVDelete) {
+        p->link = SVDelete->link;   // Xoa node chua dl sinh vien
+        delete SVDelete; }
 }
 
-
-
-void TimXoaSV(Node*& head) {
-    Node* curr = head;
+void TimXoaSV(Node*& first) {
+    Node* p = first;
     bool DSCotrung = false;
 
-    while (curr != nullptr) {
-        bool Cotrung = false;
-        for (Node* q = head; q != nullptr; q = q->link) {      // Duyet danh sach de tim
-            if (curr != q && 
-                curr->data.ngaySinh.ngay == q->data.ngaySinh.ngay &&
-                curr->data.ngaySinh.thang == q->data.ngaySinh.thang &&   // So sanh xem co trung ngay sinh kh
-                curr->data.ngaySinh.nam == q->data.ngaySinh.nam) {
-                Cotrung = true;
+    while (p != nullptr) {
+    Node* trung = nullptr;
+        
+    for (Node* q = first; q != nullptr; q = q->link) {    // Do tim xem co ai trung ngay sinh kh
+         if (p != q &&  p->data.ngaySinh.ngay == q->data.ngaySinh.ngay && p->data.ngaySinh.thang == q->data.ngaySinh.thang &&  p->data.ngaySinh.nam == q->data.ngaySinh.nam) 
+        {  trung = q; // Tim thay nguoi trung ngay sinh
                 break;
             }
         }
 
-        if (Cotrung) {         //Neu phat hien ra trung ngay sinh
-            cout << "Phat hien va dang loai bo: " << curr->data.hoTen          
-                 << " (Ngay sinh: " << curr->data.ngaySinh.ngay << "/" << curr->data.ngaySinh.thang << ")" << endl;
-            
-            Node* temp = curr;
-            curr = curr->link; // Nhay sang node tiep theo de dò tiep
-            XoaSV(head, temp); // Xoa sinh vien trung ngay sinh
+        if (trung != nullptr) {
+            Ngay Ngaysinhtrung = p->data.ngaySinh;        // Khai bao bien ngay can xoa la ngay sinh bi trung
             DSCotrung = true;
-        } else {
-            curr = curr->link;   }    // Khong trung thi duyet tiep
+
+            Node* r = first;      // Khai bao 1 bien de tim nhung nguoi cung ngay sinh do
+            while (r != nullptr) {
+                if (r->data.ngaySinh.ngay == Ngaysinhtrung.ngay &&  r->data.ngaySinh.thang == Ngaysinhtrung.thang &&  r->data.ngaySinh.nam == Ngaysinhtrung.nam)
+                { cout << r->data.hoTen << " (Ngay sinh: " << Ngaysinhtrung.ngay << "/" << Ngaysinhtrung.thang << ")" << endl;    // In ra nhung nguoi cung ngay sinh
+                    
+                    Node* SVcanxoa = r;
+                    r = r->link;          
+                    XoaSV(first, SVcanxoa);      // Xoa nguoi trung ngay sinh
+                } else { r = r->link;  } // Khong trung thi duyet tiep
+            }
+            
+            p = first;  }
+             else {p = p->link; }    // Neu khong co ngay sinh bi trung thi duyet tiep
     }
 
-    if (!DSCotrung) { // Neu ds khong co ai trung nsinh
-        cout << "Khong tim thay sinh vien nao co cung ngay sinh." << endl;
+    if (!DSCotrung) {
+        cout << "Khong tim thay sinh vien cung ngay sinh." << endl;
     }
 }
 
 
-// Hàm in danh sách đơn giản
-void InDanhSach(Node* head) {
-    cout << "------------------------------------------" << endl;
-    cout << "MSSV\tHo Ten\t\tLop" << endl;
-    Node* p = head;
-    while (p != nullptr) {
-        cout << p->data.maSV << "\t" 
-             << p->data.hoTen << "\t" 
-             << p->data.lop << endl;
+void InDanhSach(Node* first) {
+    if (first == nullptr) {
+        cout << "Danh sach trong!" << endl;
+        return;
+    }
+
+    cout << "\n                DANH SACH SINH VIEN                     " << endl;
+    cout << "   MSSV        Ho Ten      GT    Ngay Sinh  Lop  Khoa " << endl;
+    cout << "------------------------------------------------------------" << endl;
+
+    Node* p = first;
+    while (p != nullptr) {  cout << p->data.maSV << " | " << p->data.hoTen << " - ";
+
+    if (p->data.gioiTinh == 1) cout << "Nam - ";
+    else cout << "Nu - ";
+    cout << p->data.ngaySinh.ngay << "/" << p->data.ngaySinh.thang << "/"  << p->data.ngaySinh.nam << " - " << p->data.lop << " - " << p->data.khoa << endl;
         p = p->link;
     }
-    cout << "------------------------------------------" << endl;
 }
 
 int main() {
-    List L;
-    L.first = nullptr; 
-    L.last = nullptr;
+    List ListSV;
+    ListSV.first = nullptr; 
+    ListSV.last = nullptr;
  
-    ThemSV(L, {"202414405", "Tran Hoang Hai", 1, {10, 1, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414406", "Nguyen Duc Duy", 1, {15, 2, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414401", "Nguyen Duc Kien", 1, {20, 3, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414413", "Ha Dang Quang", 1, {5, 4, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414203", "Van Thanh Dat", 1, {12, 5, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414073", "Nguyen Khanh Huyen", 0, {25, 6, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414074", "Le Khanh Linh", 0, {25, 6, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414063", "Nguyen Manh Thien", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414058", "Tran Duc Manh", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414365", "Nguyen Quoc Huy", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
-    ThemSV(L, {"202414103", "Hoang Lam Que", 0, {18, 8, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414405", "Tran Hoang Hai", 1, {10, 1, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414406", "Nguyen Duc Duy", 1, {15, 2, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414401", "Nguyen Duc Kien", 1, {20, 3, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414413", "Ha Dang Quang", 1, {5, 4, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414203", "Van Thanh Dat", 1, {12, 5, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414073", "Nguyen Khanh Huyen", 0, {25, 6, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414074", "Le Khanh Linh", 0, {25, 6, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414063", "Nguyen Manh Thien", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414058", "Tran Duc Manh", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414365", "Nguyen Quoc Huy", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV( ListSV, {"202414103", "Hoang Lam Que", 0, {18, 8, 2006}, "HN", "DT05", "SEEE"});
 
+     InDanhSach( ListSV.first);
 
-
-    cout << "\n========= TIEN HANH DO TIM VA XOA TRUNG =========" << endl;
-    // Gọi hàm gộp ở đây
-    TimXoaSV(L.first);
-
-    cout << "\n========= DANH SACH SAU KHI DA XOA =========" << endl;
-    InDanhSach(L.first);
+    cout << "\nCac Sinh vien co trung ngay sinh la:" << endl;
+    TimXoaSV( ListSV.first);
 
 
 
