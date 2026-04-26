@@ -1,15 +1,16 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 using namespace std;
 
-struct Ngay
+struct Ngay     // Khai bao cau truc ngay
   {
 	int ngay, thang, nam;
   };
 
-struct SinhVien
+struct SinhVien   // Khai bao cau truc sinh vien
   {
-	char maSV[8];
+	char maSV[10];
 	char hoTen[50];
 	int gioiTinh;
 	Ngay ngaySinh;
@@ -18,58 +19,75 @@ struct SinhVien
 	char khoa[7];
    };
 
-struct Node
+struct Node    // Khai bao node
 {
 	SinhVien data;
 	Node *link;
 };
-struct List
+struct List     // Khai bao danh sach
 {
  	Node *first;
 	Node *last;
 };
 
 
-int main() {
-   
-    List L;
-    L.first = L.last = NULL;
+void ThemSV(Node*& head, SinhVien newSVData) {     // 1. Tạo Node mới và gán dữ liệu
+    
+    Node* Newnode = new Node;
+    Newnode->data = newSVData;
+    Newnode->link = nullptr;
 
-    SinhVien ds[4] = {
-        {"SV001", "Dang Van Duy", 1, {15, 5, 2005}, "HN", "DT01", "DT"},
-        {"SV002", "Dang Van Duy", 1, {20, 10, 2005}, "HP", "DT02", "DT"},
-        {"SV003", "Dang Van Duy", 0, {15, 5, 2005}, "ND", "DT01", "DT"},
-        {"SV004", "Dang Van Duy", 1, {1, 1, 2005}, "TH", "DT03", "CNTT"}
-    };
-
-    for (int i = 0; i < 4; i++) {
-        Node* newNode = new Node;
-        newNode->data = ds[i];
-        newNode->link = NULL;
-
-        if (L.first == NULL) {
-            L.first = L.last = newNode;
-        } else {
-            L.last->link = newNode;
-            L.last = newNode;
-        }
+    // 2. Trường hợp danh sách rỗng hoặc MSSV mới nhỏ hơn MSSV đầu tiên
+    // strcmp(a, b) < 0 nghĩa là chuỗi a nhỏ hơn chuỗi b về mặt từ điển
+    if (head == nullptr || strcmp(newSVData.maSV, head->data.maSV) < 0) {
+        Newnode->link = head;
+        head = Newnode;
+        return;
     }
 
-    cout  << "MSSV" << "Ho Ten"  << "Lop" << "Ngay Sinh" << endl;
-    cout << "------------------------------------------------------------" << endl;
-    
-    Node* p = L.first;
-    while (p != NULL) {
-        cout  << p->data.maSV << p->data.hoTen  << p->data.lop  << p->data.ngaySinh.ngay << "/" << p->data.ngaySinh.thang << "/" << p->data.ngaySinh.nam << endl;
+    // 3. Tìm vị trí để chèn sao cho danh sách vẫn giữ thứ tự tăng dần MSSV
+    Node* p = head;
+    while (p->link != nullptr && strcmp(p->link->data.maSV, newSVData.maSV) < 0) {
         p = p->link;
     }
 
-    // 4. Giải phóng bộ nhớ
-    while (L.first != NULL) {
-        Node* temp = L.first;
-        L.first = L.first->link;
-        delete temp;
+    // 4. Thực hiện chèn node mới vào sau node p
+    Newnode->link = p->link;
+    p->link = Newnode;
+}
+
+// Hàm in danh sách đơn giản
+void InDanhSach(Node* head) {
+    cout << "------------------------------------------" << endl;
+    cout << "MSSV\tHo Ten\t\tLop" << endl;
+    Node* p = head;
+    while (p != nullptr) {
+        cout << p->data.maSV << "\t" 
+             << p->data.hoTen << "\t" 
+             << p->data.lop << endl;
+        p = p->link;
     }
+    cout << "------------------------------------------" << endl;
+}
+
+int main() {
+    Node* head = nullptr; 
+    // Thêm vào (hàm ThemSV sẽ tự sắp xếp theo MSSV)
+// Danh sach 8 sinh vien voi MSSV 8 so (dang 2024xxxx)
+// Danh sach 8 sinh vien voi MSSV 9 so
+    ThemSV(head, {"202414405", "Tran Hoang Hai", 1, {10, 1, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV(head, {"202414406", "Nguyen Duc Duy", 1, {15, 2, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV(head, {"202414401", "Nguyen Duc Kien", 1, {20, 3, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV(head, {"202414413", "Ha Dang Quang", 1, {5, 4, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV(head, {"202414203", "Van Thanh Dat", 1, {12, 5, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV(head, {"202414073", "Le Khanh Linh", 0, {25, 6, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV(head, {"202414063", "Nguyen Manh Thien", 1, {30, 7, 2006}, "HN", "DT05", "SEEE"});
+    ThemSV(head, {"202414103", "Hoang Lam Que", 0, {18, 8, 2006}, "HN", "DT05", "SEEE"});
+  
+
+    // In ra kết quả
+    cout << "Danh sach sinh vien sau khi sap xep:" << endl;
+    InDanhSach(head);
 
     return 0;
 }
