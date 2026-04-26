@@ -31,26 +31,22 @@ struct List     // Khai bao danh sach
 };
 
 void ThemSV(List &L, SinhVien newSVData) {
-    // 1. Tạo Node mới
-    Node* Newnode = new Node;
+    Node* Newnode = new Node;       // Khai bao mot node moi
     Newnode->data = newSVData;
     Newnode->link = nullptr;
 
-    // 2. Trường hợp danh sách rỗng hoặc MSSV mới nhỏ hơn MSSV đầu tiên (Chèn đầu)
     if (L.first == nullptr || strcmp(newSVData.maSV, L.first->data.maSV) < 0) {
         Newnode->link = L.first;
-        L.first = Newnode;
+        L.first = Newnode;              // Chen vao dau tien neu ds dang rong
         return;
     }
 
-    // 3. Tìm vị trí để chèn sao cho giữ thứ tự tăng dần MSSV (Chèn giữa hoặc cuối)
     Node* p = L.first;
     while (p->link != nullptr && strcmp(p->link->data.maSV, newSVData.maSV) < 0) {
-        p = p->link;
+        p = p->link;                           // Tim vi tri chen
     }
 
-    // 4. Thực hiện chèn
-    Newnode->link = p->link;
+    Newnode->link = p->link;                // Chen node
     p->link = Newnode;
 }
 
@@ -76,40 +72,35 @@ void XoaSV(Node*& head, Node* toDelete) {
 
 
 
-void TimInVaXoaTrung(Node*& head) {
+void TimXoaSV(Node*& head) {
     Node* curr = head;
-    bool coBatKyAiTrung = false;
+    bool DSCotrung = false;
 
     while (curr != nullptr) {
-        bool biTrung = false;
-        
-        // 1. Dò xem curr có trùng với bất kỳ ai khác trong danh sách không
-        for (Node* q = head; q != nullptr; q = q->link) {
+        bool Cotrung = false;
+        for (Node* q = head; q != nullptr; q = q->link) {      // Duyet danh sach de tim
             if (curr != q && 
                 curr->data.ngaySinh.ngay == q->data.ngaySinh.ngay &&
-                curr->data.ngaySinh.thang == q->data.ngaySinh.thang &&
+                curr->data.ngaySinh.thang == q->data.ngaySinh.thang &&   // So sanh xem co trung ngay sinh kh
                 curr->data.ngaySinh.nam == q->data.ngaySinh.nam) {
-                biTrung = true;
+                Cotrung = true;
                 break;
             }
         }
 
-        // 2. Nếu trùng: In thông báo và gọi hàm XoaNode ngay sau đó
-        if (biTrung) {
-            cout << "Phat hien va dang loai bo: " << curr->data.hoTen 
+        if (Cotrung) {         //Neu phat hien ra trung ngay sinh
+            cout << "Phat hien va dang loai bo: " << curr->data.hoTen          
                  << " (Ngay sinh: " << curr->data.ngaySinh.ngay << "/" << curr->data.ngaySinh.thang << ")" << endl;
             
             Node* temp = curr;
-            curr = curr->link; // Nhảy sang node tiếp theo TRƯỚC khi xóa node hiện tại
-            XoaSV(head, temp); // Gọi hàm xóa node mà bạn đã viết ở trên
-            coBatKyAiTrung = true;
+            curr = curr->link; // Nhay sang node tiep theo de dò tiep
+            XoaSV(head, temp); // Xoa sinh vien trung ngay sinh
+            DSCotrung = true;
         } else {
-            // 3. Nếu không trùng thì cứ đi tiếp bình thường
-            curr = curr->link;
-        }
+            curr = curr->link;   }    // Khong trung thi duyet tiep
     }
 
-    if (!coBatKyAiTrung) {
+    if (!DSCotrung) { // Neu ds khong co ai trung nsinh
         cout << "Khong tim thay sinh vien nao co cung ngay sinh." << endl;
     }
 }
@@ -150,7 +141,7 @@ int main() {
 
     cout << "\n========= TIEN HANH DO TIM VA XOA TRUNG =========" << endl;
     // Gọi hàm gộp ở đây
-    TimInVaXoaTrung(L.first);
+    TimXoaSV(L.first);
 
     cout << "\n========= DANH SACH SAU KHI DA XOA =========" << endl;
     InDanhSach(L.first);
