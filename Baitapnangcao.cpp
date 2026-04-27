@@ -3,79 +3,67 @@
 
 using namespace std;
 
-// Cấu trúc một nút trong danh sách liên kết
-struct Node {
+struct Node {     // Khai bao
     int data;
     Node* link;   };
 
-Node* createCircularList(int n) {
+Node* Taolistvong(int n) {
     if (n <= 0) return nullptr;
 
-    Node *head = nullptr;
-    Node *tail = nullptr;
+    Node *first = nullptr;
+    Node *last = nullptr;
 
-    // GIAI ĐOẠN 1: Tạo danh sách liên kết đơn từ 1 đến N
-    for (int i = 1; i <= n; i++) {
-        // Tạo node mới
+    for (int i = 1; i <= n; i++) {     // tao ds don 
         Node* newNode = new Node();
-        newNode->data = i;
+        newNode->data = i;          // truyen so vao danh sach
         newNode->link = nullptr;
 
-        if (head == nullptr) {
-            head = newNode; // Nút đầu tiên
-            tail = newNode;
-        } else {
-            tail->link = newNode; // Nối tiếp vào đuôi
-            tail = newNode;       // Cập nhật nút đuôi mới
+    if (first == nullptr) {   // Neu ds trong
+            first = newNode;    // them 1 nguoi la dau va cuoi
+            last = newNode; } 
+        else {
+            last->link = newNode;  // Them nguoi neu da co nguo itrong list
+            last = newNode;       
         }
     }
 
-    // GIAI ĐOẠN 2: Nối đầu đuôi để thành vòng tròn (Circular)
-    if (tail != nullptr) {
-        tail->link = head; 
-        // Thay vì trỏ vào nullptr, đuôi trỏ về head để tạo vòng
+    if (last != nullptr) {
+        last->link = first;    // Noi thanh ds vong tron
     }
 
-    return head;
+    return first;
 }
 
 
-void findAndPrintWinner(Node* head, int m) {
-    if (head == nullptr) return;
+void Timnguoithang(Node* first, int m) {
+    if (first == nullptr) return;   // neu ds trong thi thoi
 
-    Node* curr = head;
-    Node* prev = nullptr;
+    Node* p = first;   // nguoi dau tien
+    Node* q = nullptr;    // nguo icuoi cung ( truoc p)
 
-    // Tìm nút đứng trước head để lát nữa dễ dàng xóa nút
-    Node* temp = head;
-    while (temp->link != head) {
-        temp = temp->link;
+    Node* temp = first;            // Tim nguoi dang dung truoc nguoi dau tien
+    while (temp->link != first) {
+        temp = temp->link;          
     }
-    prev = temp; // prev lúc này là nút cuối cùng (đuôi)
-
-    cout << "Thu tu bi loai: ";
+    q = temp; // q la nguoi cuoi cung
+   // cout << "Nhung nguoi bi loai: ";
     
-    // Vòng lặp dừng khi chỉ còn 1 người (người đó tự trỏ vào chính mình)
-    while (curr->link != curr) {
-        // 1. Nhảy m bước
+    while (p->link != p) {     // Neu ds kh chi co 1 nguoi
         for (int i = 0; i < m; i++) {
-            prev = curr;
-            curr = curr->link;
+            q = p;     // danh dau vi tri dung truoc cua con tro dang duyet
+            p = p->link;    // chuyen bong
         }
-
-        // 2. Loại bỏ người tại vị trí curr
-        cout << curr->data << " ";
-        prev->link = curr->link; // Nối người trước đó qua người bị loại
+   //     cout << p->data << " ";    // in ra nguoi bi loai
+        q->link = p->link;     // Xoa nguoi bi loai
         
-        Node* toDelete = curr;
-        curr = curr->link; // Người kế tiếp giữ bóng cho lượt mới
-        delete toDelete;   // Giải phóng bộ nhớ
+        Node* Xoa = p;
+        p = p->link; // Nguoi dung dau luot moi
+        delete Xoa;   
     }
 
-    cout << "\nNguoi chien thang cuoi cung la: " << curr->data << endl;
-    delete curr; // Xóa nút cuối cùng
+    cout << "\nNguoi con lai la: " << p->data << endl;
+    delete p; // Xoa nguoi cuoi cung
 }
-
 
 int main() {
     int n, m;
@@ -83,12 +71,11 @@ int main() {
     cin >> n;
     cout << "Nhap so luot truyen M: ";
     cin >> m;
-
-    // 1. Tạo vòng tròn
-    Node* circle = createCircularList(n);
-
-    // 2. Duyệt tìm người thắng cuộc
-    findAndPrintWinner(circle, m);
-
+    Node* a = Taolistvong(n); // Tao ds vong tron
+    auto start = chrono::high_resolution_clock::now();
+    Timnguoithang(a, m); // Duyet tim nguoi cuoi cung
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start;
+    cout << "\n Thoi gian chay: " << duration.count() << " s" << endl;
     return 0;
 }
