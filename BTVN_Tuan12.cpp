@@ -1,92 +1,99 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cmath>
+// Cài đặt cấu trúc cây cấu trúc lưu trữ tuần tự, gốc của cây mang thứ tự 0, khác với tlieu slide là 1
 
+#include <iostream>
 using namespace std;
 
+#define MAX_NODES 100     
+#define MAXLENGTH 100     // so ptu tối đa của cây là 100
+#define NIL -1            // nut rỗng
 
-struct Node {
-    char data;
-    Node *left, *right;
-    Node(char val) : data(val), left(nullptr), right(nullptr) {}
-};
+typedef int DataType;
+typedef int Node;
 
-// 1. Hàm tính chiều cao của cây
-int getHeight(Node* root) {
-    if (root == nullptr) return 0;
-    return 1 + max(getHeight(root->left), getHeight(root->right));
+typedef struct {
+    DataType Data[MAXLENGTH]; // Lưu giá trị của nút
+    int MaxNode;              
+} Tree;        // tạo kiểu dl để lưu trữ cây
+
+
+int EmptyTree(Tree T)     // Ktra cây rỗng
+{      
+    return T.MaxNode == 0;  }
+
+Node Root(Tree T) {        // Xác định nút gốc trong cây
+    if (!EmptyTree(T))        return 0;        // Nếu cây kh rỗng thì nút gốc luôn nằm ở vtri 0
+    else                      return NIL;  // cây rỗng thì trả về NIL   
 }
 
-// 2. Hàm đệ quy phẳng hóa cây móc nối vào mảng tuần tự
-void flattenTreeToArray(Node* root, int index, vector<string>& arr) {
-    if (root == nullptr || index >= arr.size()) return;
+int Left_Child(Node p, Tree T) {    // Hàm xđ vtri con trái của nút p
+    if (p == NIL) return NIL;   
+
+    int left = 2 * (p + 1) - 1; // Vị trí nút con trái của nút vtri p theo slide: 2*(p+1) - 1
+    if (left < T.MaxNode) 
+    return left; // trả về vtri nút con bên trái nút p nếu nó có dl
+    return NIL;            }
+
+int Right_Child(Node p, Tree T) {   // Hàm xđ vtri con trái của nút p, như nút trái
+    if (p == NIL) return NIL;
     
-    arr[index] = string(1, root->data); 
+    int right = 2 * (p + 1);    // công thức: 2*(p+1)
+    if (right < T.MaxNode)      return right;
+    return NIL;       }
+
+void InitTree(Tree &T) { // hàm khởi tạo cây rỗng
+    T.MaxNode = 0;
+    for (int i = 0; i < MAXLENGTH; i++) {
+        T.Data[i] = NIL;       //các vtri ban đầu đều là NIL 
+    }      }
+
+/*void InputTree(Tree &T) {       // Hàm nhập dl cho cây
+    InitTree(T);
+    int n;
+    cout << "Nhap so luong nut cua cay: ";
+    cin >> n;
+    if (n <= 0) return;
+    cout << "Nhap gia tri cho cac nut tu trai sang phai, tu tren xuong duoi, neu nut trong nhap NIL.\n";
+    int lastindex = -1;   // tao bien last index de luu vi tri nut cuoi cung co dl
     
-    // Tiếp tục duyệt các nút con
-    flattenTreeToArray(root->left, 2 * index + 1, arr);
-    flattenTreeToArray(root->right, 2 * index + 2, arr);
-}
-
-// 3. Hàm cài đặt tuần tự và in cấu trúc cây
-void printSequentialTree(Node* root) {
-    if (root == nullptr) {
-        cout << "Cay rong!" << endl;
-        return;
-    }
-
-    int height = getHeight(root);
-    int max_size = pow(2, height) - 1;
-   
-    vector<string> sequentialArr(max_size, "0");
-
-    flattenTreeToArray(root, 0, sequentialArr);
-
-    cout << "=== BIEU DIEN TUAN TU (DANG MANG) ===" << endl;
-    cout << "Chi so (Index): ";
-    for (int i = 0; i < max_size; i++) {
-        printf("%3d ", i);
-    }
-    cout << "\ Gia tri (Data): ";
-    for (int i = 0; i < max_size; i++) {
-        printf("%3s ", sequentialArr[i].c_str());
-    }
-    cout << "\n\n";
-
-    cout << "=== MO PHONG THEO TANG CAY ===" << endl;
-    int current_level = 0;
-    int items_in_level = 1;
-    int printed_items = 0;
-
-    for (int i = 0; i < max_size; i++) {
-        if (printed_items == 0) {
-            cout << "Tang " << current_level << ": ";
+    for (int i = 0; i < n; i++) {
+        if (i >= MAXLENGTH) {
+        cout << "Vuot qua so luong nut!\n";
+         break;
         }
-        
-        cout << sequentialArr[i] << " ";
-        printed_items++;
-
-        if (printed_items == items_in_level) {
-            cout << endl;
-            current_level++;
-            items_in_level *= 2; // Số lượng nút ở tầng kế tiếp nhân đôi
-            printed_items = 0;
+        cin >> T.Data[i];    // nhap gtri cac nut theo thu tu
+        if (T.Data[i] != NIL) {
+        lastindex = i;        // gan vitri nut cuoi cung co dl vao bien lastindex
         }
     }
-    cout << "-------------------------------------" << endl;
+    T.MaxNode = lastindex + 1;// cap nhat maxnode la vitri node cuoi cung co dl +1, cat cac o trong duoi cung khong dl
+}   */
+
+
+// Duyet và in cây theo thứ tự lưu trữ kế tiếp
+void Printtree(Node p, Tree T) {
+    if (p == NIL || p >= T.MaxNode) {  // Dừng nếu vượt ranh giới 
+        return; 
+    }
+// 2. Nếu vị trí p hợp lệ nhưng ô mảng đó mang giá trị trống (NIL) -> In số 0
+    if (T.Data[p] == NIL) {  cout << "0 ";  }   // Nếu ô trống thì in số 0
+    
+    else {     cout << T.Data[p] << " ";    }   // Nếu ô mảng đó có dữ liệu -> In giá trị của nút
+    Printtree(Left_Child(p, T), T);        // In ra con trái trước
+    Printtree(Right_Child(p, T), T);       // Con phải sau 
 }
 
 int main() {
-
-    Node* root = new Node('A');
-    root->left = new Node('B');
-    root->right = new Node('C');
-    root->left->left = new Node('D');
-    root->right->left = new Node('E'); 
-
-    // Chạy hàm in cấu trúc tuần tự
-    printSequentialTree(root);
-
+    Tree Tziczac;
+    InitTree(Tziczac); 
+    Tziczac.Data[0]  = 1;  // Nút gốc (1) ở ô 0
+    Tziczac.Data[1]  = 2;  // Con trái của 1 ở ô 1
+    Tziczac.Data[4]  = 3;  // Con phải của 2 ở ô 4
+    Tziczac.Data[9]  = 4;  // Con trái của 3 ở ô 9
+    Tziczac.Data[20] = 5;  // Con phải của 4 ở ô 20
+ 
+    Tziczac.MaxNode = 21;
+    cout << "Duyet cay theo thu tu truoc (Pre-order): ";
+    Printtree(Root(Tziczac), Tziczac);
+    cout << endl; 
     return 0;
 }
